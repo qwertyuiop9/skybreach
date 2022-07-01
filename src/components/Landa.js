@@ -10,8 +10,7 @@ import img_rarity_harb from './images/rarityHarb.png';
 import img_rarity_premium from './images/rarityPremium.png';
 
 // Entropy levels
-const entropy_categories = [1,2,3,4,5];
-const entropy_values = [0.0001, 0.0005, 0.001, 0.005, 0.01];
+const entropy_values = [0.0001, 0.0005, 0.001, 0.005, 0.01, 100];
 
 // 1. Import ethers
 const ethers = require('ethers');
@@ -53,13 +52,15 @@ function getImagePerRarity(rarity) {
     }
 }
 
-function getListingPrice(value) {
-    if (value == null) {
-        return "---";
-    } else {
-        return value
+function getListingPrice(value, data) {
+    if (parseInt(data['entropy']) != 0) {
+        if (value != null) {
+            return value;
+        }
     }
+    return "-";
 }
+
 
 function Landa(props) {
 
@@ -71,28 +72,49 @@ function Landa(props) {
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isOwnerLoaded, setIsOwnerLoaded] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
 
         const promise_land_data = contract.getPlotData(props.land_id);
         const promise_land_owner = contract.getPlotOwner(props.land_id);
         const promise_land_is_listed = contract.getIsListed(props.land_id);
-        const promise_listed_price = contract.getListedPrice(props.land_id);
 
-        Promise.all([promise_land_data, promise_land_owner]).then(all_responses => {
-            setData(all_responses[0]);
-            setOwner(all_responses[1]);
-            setIsListed(all_responses[2]);
-            setListedPrice(all_responses[3]);
-            // Update loading states
-            setIsDataLoaded(true);
-            setIsOwnerLoaded(true);
-        }).catch(errors => {
-            console.error(errors);
-            setIsDataLoaded(false);
-            setIsOwnerLoaded(false);
-        }, [props.land_id]);
+        Promise.all(
+            [promise_land_data,
+                promise_land_owner,
+                promise_land_is_listed])
+            .then(all_responses => {
+                setData(all_responses[0]);
+                setOwner(all_responses[1]);
+                setIsListed(all_responses[2]);
+                // Update loading states
+                setIsDataLoaded(true);
+                setIsOwnerLoaded(true);
+            }).catch(all_responses => {
+                console.error(all_responses);
+                setIsDataLoaded(false);
+                setIsOwnerLoaded(false);
+            });
+
+
+        if (isListed) {
+            console.log("Dato 'isListed' " + isListed);
+            const promise_listed_price = contract.getListedPrice(props.land_id);
+            promise_listed_price.then(response => {
+                if (isListed) {
+                    setListedPrice(response);
+                } else {
+                    setListedPrice("-_-");
+                }
+            }).catch(error => {
+                console.error("Errore sulla chiamata 'contract.getListedPrice'" + error);
+                setListedPrice('---');
+            });
+        } else {
+            setListedPrice(null);
+        }
+
+
 
     }, [props.land_id]);
 
@@ -102,12 +124,13 @@ function Landa(props) {
                 <td>{props.land_id}</td>
                 <td>{props.land_id % 256}</td>
                 <td>{Math.floor(props.land_id / 256)}</td>
-                <td><img src={getImagePerRarity(data['rarity'])} /></td>
-                <td>{owner}</td>
+                <td><img width="50" height="50" src={getImagePerRarity(data['rarity'])} /></td>
+                <td>{getOwner(owner, data['entropy'])}</td>
+                <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
-                <td>{getListingPrice(listedPrice)}</td>
+                <td>{getListingPrice(listedPrice, data)}</td>
                 <td>{getBuyButton(isListed)}</td>
-              </tr>
+            </tr>
         )
     } else {
         return <h4>Loading...</h4>
@@ -126,7 +149,18 @@ function getBuyButton(isLandListed) {
 
 function getEntropy(response_value) {
     const entropyCategory = parseInt(response_value) - 1;
+    if (entropyCategory == -1) {
+        return "-"
+    }
     return entropy_values[entropyCategory] + " %";
+}
+
+function getOwner(owner, entropy) {
+    if (entropy != 0) {
+        return owner;
+    } else {
+        return "LAND NOT AVAILABLE";
+    }
 }
 
 export default Landa;
