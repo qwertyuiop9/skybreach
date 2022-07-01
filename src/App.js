@@ -26,8 +26,8 @@ function App() {
 
   const [plotToWatch, setPlotToWatch] = useState(null);
   const [adjacentPlots, setAdjacentPlots] = useState([]);
-  const inputXRef = useRef(95);
-  const inputYRef = useRef(16);
+  const inputXRef = useRef(null);
+  const inputYRef = useRef(null);
 
   function handleClick() {
     console.log("X:" + inputXRef.current.value + " Y: " + inputYRef.current.value);
@@ -86,7 +86,6 @@ function App() {
             <th scope="col">Y</th>
             <th scope="col">Rarity</th>
             <th scope='col'>Owned by</th>
-            <th scope='col'>Entropy</th>
             <th scope='col'>On sale</th>
             <th scope='col'>Actual price (RMRK)</th>
             <th scope='col'>BUY</th>

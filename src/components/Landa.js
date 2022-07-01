@@ -80,7 +80,7 @@ function Landa(props) {
         const promise_land_is_listed = contract.getIsListed(props.land_id);
         const promise_listed_price = contract.getListedPrice(props.land_id);
 
-        Promise.all([promise_land_data, promise_land_owner, promise_land_is_listed, promise_listed_price]).then(all_responses => {
+        Promise.all([promise_land_data, promise_land_owner]).then(all_responses => {
             setData(all_responses[0]);
             setOwner(all_responses[1]);
             setIsListed(all_responses[2]);
@@ -104,7 +104,6 @@ function Landa(props) {
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img src={getImagePerRarity(data['rarity'])} /></td>
                 <td>{owner}</td>
-                <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
                 <td>{getListingPrice(listedPrice)}</td>
                 <td>{getBuyButton(isListed)}</td>
