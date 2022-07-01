@@ -9,6 +9,10 @@ import img_rarity_epic from './images/rarityEpic.png';
 import img_rarity_harb from './images/rarityHarb.png';
 import img_rarity_premium from './images/rarityPremium.png';
 
+// Entropy levels
+const entropy_categories = [1,2,3,4,5];
+const entropy_values = [0.0001, 0.0005, 0.001, 0.005, 0.01];
+
 // 1. Import ethers
 const ethers = require('ethers');
 
@@ -76,7 +80,7 @@ function Landa(props) {
         const promise_land_is_listed = contract.getIsListed(props.land_id);
         const promise_listed_price = contract.getListedPrice(props.land_id);
 
-        Promise.all([promise_land_data, promise_land_owner]).then(all_responses => {
+        Promise.all([promise_land_data, promise_land_owner, promise_land_is_listed, promise_listed_price]).then(all_responses => {
             setData(all_responses[0]);
             setOwner(all_responses[1]);
             setIsListed(all_responses[2]);
@@ -100,6 +104,7 @@ function Landa(props) {
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img src={getImagePerRarity(data['rarity'])} /></td>
                 <td>{owner}</td>
+                <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
                 <td>{getListingPrice(listedPrice)}</td>
                 <td>{getBuyButton(isListed)}</td>
@@ -118,6 +123,11 @@ function getBuyButton(isLandListed) {
         return <a href="https://skybreach.app/?ref=0x1280c33578a350D8AA1b2beC074f8604baea63Db" button type="button" class="btn btn-secondary btn-lg" disabled>Buy</a>
 
     }
+}
+
+function getEntropy(response_value) {
+    const entropyCategory = parseInt(response_value) - 1;
+    return entropy_values[entropyCategory] + " %";
 }
 
 export default Landa;
