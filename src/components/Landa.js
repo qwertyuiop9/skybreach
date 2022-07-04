@@ -11,6 +11,8 @@ import img_rarity_premium from './images/rarityPremium.png';
 
 // Entropy levels
 const entropy_values = [0.0001, 0.0005, 0.001, 0.005, 0.01, 100];
+// Biomes names
+const biome_key_values = ["cyber", "steampunk", "wind", "volcano", "fire", "water", "necro", "mecha", "dragon", "meadow"];
 
 // 1. Import ethers
 const ethers = require('ethers');
@@ -85,6 +87,7 @@ function Landa(props) {
                 promise_land_is_listed])
             .then(all_responses => {
                 setData(all_responses[0]);
+                console.log("Risposta land:" + all_responses[0]);
                 setOwner(all_responses[1]);
                 setIsListed(all_responses[2]);
                 // Update loading states
@@ -114,8 +117,6 @@ function Landa(props) {
             setListedPrice(null);
         }
 
-
-
     }, [props.land_id]);
 
     if (isDataLoaded && isOwnerLoaded) {
@@ -126,6 +127,7 @@ function Landa(props) {
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img width="50" height="50" src={getImagePerRarity(data['rarity'])} /></td>
                 <td>{getOwner(owner, data['entropy'])}</td>
+                <td>{getBiomes(data)}</td>
                 <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
                 <td>{getListingPrice(listedPrice, data)}</td>
@@ -161,6 +163,46 @@ function getOwner(owner, entropy) {
     } else {
         return "LAND NOT AVAILABLE";
     }
+}
+
+function getBiomes(land_data) {
+
+    var result_biomes = [];
+    var result_values = [];
+
+    for (let i = 0; i < biome_key_values.length; i++) {
+        if (land_data[biome_key_values[i]] != 0) {
+            result_biomes.push(biome_key_values[i]);
+            result_values.push(land_data[biome_key_values[i]]);
+        }
+    }
+
+    if (result_biomes.length == 1) {
+        return (<div class="row">
+            <div class="column">
+                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + land_data[result_biomes[0]] + "%"}</p>
+            </div>
+        </div>)
+    } else if (result_biomes.length == 2) {
+        return (<div class="row">
+            <div class="column">
+                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
+                <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
+            </div>
+        </div>)
+    } else {
+        return (<div class="row">
+            <div class="column">
+                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
+                <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
+                <p>{capitalizeFirstLetter(result_biomes[2]) + " " + result_values[2] + "%"}</p>
+            </div>
+        </div>)
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
 }
 
 export default Landa;
