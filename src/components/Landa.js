@@ -178,26 +178,33 @@ function getBiomes(land_data) {
     }
 
     if (result_biomes.length == 1) {
-        return (<div class="row">
+        return (
+        <div class="row">
             <div class="column">
                 <p>{capitalizeFirstLetter(result_biomes[0]) + " " + land_data[result_biomes[0]] + "%"}</p>
             </div>
         </div>)
     } else if (result_biomes.length == 2) {
-        return (<div class="row">
+        return (
+        <div class="row">
             <div class="column">
                 <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
                 <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
             </div>
         </div>)
-    } else {
-        return (<div class="row">
+    } else if (result_biomes.length == 3) {
+        return (
+        <div class="row">
             <div class="column">
                 <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
                 <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
                 <p>{capitalizeFirstLetter(result_biomes[2]) + " " + result_values[2] + "%"}</p>
             </div>
         </div>)
+    } else {
+        return (<div class="column">
+        <p>Not available</p>
+    </div>)
     }
 
     function capitalizeFirstLetter(string) {
