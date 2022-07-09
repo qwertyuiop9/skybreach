@@ -8,6 +8,8 @@ import img_rarity_rare from './images/rarityRare.png';
 import img_rarity_epic from './images/rarityEpic.png';
 import img_rarity_harb from './images/rarityHarb.png';
 import img_rarity_premium from './images/rarityPremium.png';
+// Colors for different addresses
+import { colorMap } from "./SkybreachConstants";
 
 // Entropy levels
 const entropy_values = [0.0001, 0.0005, 0.001, 0.005, 0.01, 100];
@@ -121,7 +123,7 @@ function Landa(props) {
 
     if (isDataLoaded && isOwnerLoaded) {
         return (
-            <tr>
+            <tr >
                 <td>{props.land_id}</td>
                 <td>{props.land_id % 256}</td>
                 <td>{Math.floor(props.land_id / 256)}</td>
@@ -135,7 +137,7 @@ function Landa(props) {
             </tr>
         )
     } else {
-        return <h4>Loading...</h4>
+        return <p>Loading...</p>
     }
 
 }
@@ -147,6 +149,29 @@ function getBuyButton(isLandListed) {
         return <a href="https://skybreach.app/?ref=0x1280c33578a350D8AA1b2beC074f8604baea63Db" button type="button" class="btn btn-secondary btn-lg" disabled>Buy</a>
 
     }
+}
+
+function getColoredOwner(_landId, _owner , _color) {
+
+        switch (_color) {
+            case 0:
+                return (<p class="text-primary">{_owner}</p>);
+            case 1:
+                return (<p class="text-secondary">{_owner}</p>);
+            case 2:
+                return (<p class="text-success">{_owner}</p>);
+            case 3:
+                return (<p class="text-danger">{_owner}</p>);
+            case 4:
+                return (<p class="text-warning">{_owner}</p>);
+            case 5:
+                return (<p class="text-info">{_owner}</p>);
+            case 6:
+                return (<p class="text-dark">{_owner}</p>);
+            case 7:
+                return (<p class="text-muted">{_owner}</p>);
+        }
+    
 }
 
 function getEntropy(response_value) {
@@ -179,37 +204,38 @@ function getBiomes(land_data) {
 
     if (result_biomes.length == 1) {
         return (
-        <div class="row">
-            <div class="column">
-                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + land_data[result_biomes[0]] + "%"}</p>
-            </div>
-        </div>)
+            <div class="row">
+                <div class="column">
+                    <p>{capitalizeFirstLetter(result_biomes[0]) + " " + land_data[result_biomes[0]] + "%"}</p>
+                </div>
+            </div>)
     } else if (result_biomes.length == 2) {
         return (
-        <div class="row">
-            <div class="column">
-                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
-                <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
-            </div>
-        </div>)
+            <div class="row">
+                <div class="column">
+                    <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
+                    <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
+                </div>
+            </div>)
     } else if (result_biomes.length == 3) {
         return (
-        <div class="row">
-            <div class="column">
-                <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
-                <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
-                <p>{capitalizeFirstLetter(result_biomes[2]) + " " + result_values[2] + "%"}</p>
-            </div>
-        </div>)
+            <div class="row">
+                <div class="column">
+                    <p>{capitalizeFirstLetter(result_biomes[0]) + " " + result_values[0] + "%"}</p>
+                    <p>{capitalizeFirstLetter(result_biomes[1]) + " " + result_values[1] + "%"}</p>
+                    <p>{capitalizeFirstLetter(result_biomes[2]) + " " + result_values[2] + "%"}</p>
+                </div>
+            </div>)
     } else {
         return (<div class="column">
-        <p>Not available</p>
-    </div>)
+            <p>Not available</p>
+        </div>)
     }
 
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
-      }
+    }
+
 }
 
 export default Landa;
