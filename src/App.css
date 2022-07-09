@@ -13,6 +13,11 @@
   }
 }
 
+.textarea {
+  width: 300px;
+  height: 25px;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -42,8 +47,8 @@
 }
 
 .myTitle {
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 10px;
+  color: #ffffff;
 }
 
 .small_margin {
@@ -88,4 +93,18 @@
 }
 .footer .copyright p {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dapp-top-section {
+  flex: 0 0 50%;
+  padding: 0;
+}
+
+.article-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.small_container {
+  width: 100px;
 }
