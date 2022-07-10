@@ -40,15 +40,28 @@ function App() {
     // Smart Contract calls
     let contract = new ethers.Contract(contractAddress, ABI, provider);
     var ids = getIdsFromAdjacents(getAdjacentPlots(new_plot_id));
-    contract.getPlotOwners(ids).then(response => {
-      console.log("Retrieved neighbour addresses" + response);
-      setOwnerAddresses(response);
-      differentNeighbours = new Set(response);
-      setNeighbourLoveValue((differentNeighbours.size + 10) + " %");
+    const callGetPlotOwners = contract.getPlotOwners(ids);
+    const callGetBlockTimestamp = provider.getBlock();
+    Promise.all([callGetPlotOwners, callGetBlockTimestamp]).then(responses => {
+      console.log("Retrieved neighbour addresses" + responses[0]);
+      console.log("Actual block timestamp: " + responses[1]);
+      setOwnerAddresses(responses[0]);
+      differentNeighbours = new Set(responses[0]);
+      const rawRollWinningPercentage = differentNeighbours.size + 10;
+      const actualRollWinningPercentage = rawRollWinningPercentage * getDutchNeighborLoveMultiplier(responses[1]['timestamp']);
+      setNeighbourLoveValue(actualRollWinningPercentage.toFixed(2) + " %");
     }).catch(error => {
       console.log("handleClick error: " + error);
     });
     console.log("plotToWatch= " + new_plot_id + " injected x (" + temp_x + ") injected y (" + temp_y + ")");
+  }
+
+  function getDutchNeighborLoveMultiplier(curretTimestamp) {
+    const dutchAuctionStart = 1657209600;
+    const totalDutchDays = 180;
+    const totalPassedDays = (curretTimestamp-dutchAuctionStart)/60/60/24;
+    const currentDutchMultiplier = (totalDutchDays-totalPassedDays)/totalDutchDays;
+    return currentDutchMultiplier;
   }
   
 
@@ -101,9 +114,9 @@ function App() {
         </div>
         <div className='dapp-top-section'>
           <div className='wrapper'>
-            <div className='article-container'>
-              <div className='dapp-top-section'><h4>Neighbourly Love Campaign</h4></div></div>
-            <div className='dapp-top-section'><img width="50" height="50" src={img_hearts} /></div>
+            <div className='d-flex justify-content-end'>
+              <div className='dapp-top-section'><h4>Neighbourly Love Campaign</h4></div>
+            <div className='dapp-top-section'><img width="40" height="40" src={img_hearts} /></div></div>
             <div />
             <p>Percentage of win a roll for the central land:</p>
             <textarea value={neighbourLoveValue} readonly className='textarea' />
@@ -143,12 +156,12 @@ function App() {
       </div>
       <div class="mt-5 pt-5 pb-5 footer">
         <div class="box_container_padded">
-          <div class="row">
-            <div class="col-lg-5 col-xs-12 about-company">
+          <div class="d-flex justify-content-end">
+            <div class="wrapper">
               <h2>Skybreach tools
 
               </h2>
-              <p class="pr-5 text-white-50">Skybreach tools is a free dApp that has the aim of exploring the Skybreach metaverse.</p>
+              <p class="pr-5 text-white-50">Skybreach tools is a free dApp that has the aim of helping to explore the Skybreach metaverse.</p>
               <p><a href="#"><i class="fa fa-facebook-square mr-1"></i></a><a href="#"><i class="fa fa-linkedin-square"></i></a></p>
             </div>
             <div class="col-lg-3 col-xs-12 links">
