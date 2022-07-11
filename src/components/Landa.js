@@ -149,9 +149,9 @@ function getLandPrice(_owner, _actualTimestamp, _isListed, _data) {
                 var tempDiscount = (daysPassedFromStart+0.333) / 180;
                 console.log("Days passed from start: " + daysPassedFromStart);
                 const DISCOUNT = 1 - tempDiscount * 0.9;
-                const landPrice = getPrimaryMarketPrice(landRarity, DISCOUNT).toFixed(2);
-                if (landPrice != (-1)) {
-                    landPrice + " RMRK";
+                var landPrice = getPrimaryMarketPrice(landRarity, DISCOUNT);
+                if (landPrice != -1) {
+                    return landPrice.toFixed(2) + " RMRK";
                 } else {
                     return "Not available yet";
                 }
