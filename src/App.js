@@ -6,14 +6,12 @@ import { contractAddress, ABI, provider, ethers } from './components/SkybreachCo
 import img_hearts from './components/images/heartsNeighbours.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
-
-
 function App() {
 
   const [plotToWatch, setPlotToWatch] = useState(24439);
   const [adjacentPlots, setAdjacentPlots] = useState([]);
   const [ownerAddresses, setOwnerAddresses] = useState([]);
+  const [currentBlockTimestamp, setCurrentBlockTimestamp] = useState(-1);
   // Land coordinates
   const [xCoord, setXCoord] = useState(119);
   const [yCoord, setYCoord] = useState(95);
@@ -44,7 +42,8 @@ function App() {
     const callGetBlockTimestamp = provider.getBlock();
     Promise.all([callGetPlotOwners, callGetBlockTimestamp]).then(responses => {
       console.log("Retrieved neighbour addresses" + responses[0]);
-      console.log("Actual block timestamp: " + responses[1]);
+      console.log("Actual block timestamp: " + responses[1]['timestamp']);
+      setCurrentBlockTimestamp(responses[1]['timestamp']);
       setOwnerAddresses(responses[0]);
       differentNeighbours = new Set(responses[0]);
       const rawRollWinningPercentage = differentNeighbours.size + 10;
@@ -148,7 +147,7 @@ function App() {
           <tbody>
             {
               adjacentPlots.map(land => (
-                <Landa land_id={land.id} key={land.id} />
+                <Landa land_id={land.id} key={land.id} block_timestamp={currentBlockTimestamp} />
               ))
             }
           </tbody>
