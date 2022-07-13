@@ -64,6 +64,8 @@ function Landa(props) {
     const [owner, setOwner] = useState();
     const [isListed, setIsListed] = useState();
     const [listedPrice, setListedPrice] = useState();
+    const [landOffers, setLandOffers] = useState([]);
+    const [landsOwnerByOwner, setLandsOwnerByOwner] = useState(0);
 
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isOwnerLoaded, setIsOwnerLoaded] = useState(false);
@@ -93,25 +95,37 @@ function Landa(props) {
                 setIsOwnerLoaded(false);
             });
 
-
         if (isListed) {
             contract.getListedPrice(props.land_id).then(response => {
-                if (isListed) {
-                    var actualPrice = parseInt(response) / 10000000000;
-                    console.log("Land listing price: " + actualPrice);
-                    setListedPrice(actualPrice);
-                } else {
-                    setListedPrice("-_-");
-                }
+                var actualPrice = parseInt(response) / 10000000000;
+                console.log("Land listing price: " + actualPrice);
+                setListedPrice(actualPrice);
             }).catch(error => {
                 console.error("Errore sulla chiamata 'contract.getListedPrice'" + error);
-                setListedPrice('---');
+                setListedPrice('--');
             });
         } else {
-            setListedPrice(null);
+            setListedPrice('-');
         }
+       
+        // Handling active offers for this land
+        contract.getOffers(props.land_id).then(response => {
+            console.log("Offerte per la land: " + response);
+            setLandOffers(response);
+        }).catch(error => {
+            console.log("Error getting active offers for the land => " + error);
+        });
 
-    }, [props.land_id]);
+        // Handling owner rank
+        contract.getOwnedPlots(owner).then(response => {
+            console.log("Number of lands owned by this land owner: " + response.length);
+            setLandsOwnerByOwner(response.length);
+        }).catch(error => {
+            console.error("Error getting owned lands for this land owner => " + error);
+        });
+
+
+    }, [props.land_id, owner]);
 
     if (isDataLoaded && isOwnerLoaded) {
         return (
@@ -121,10 +135,12 @@ function Landa(props) {
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img width="50" height="50" src={getImagePerRarity(data['rarity'])} /></td>
                 <td>{getColoredOwner(owner, props.neighbour_owners)}</td>
+                <td>{landsOwnerByOwner}</td>
                 <td>{getBiomes(data)}</td>
                 <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
                 <td>{getLandPrice(owner, props.block_timestamp, isListed, data, listedPrice)}</td>
+                <td>{getBestOffer(landOffers)}</td>
                 <td>{getBuyButton(getLandPrice(owner, props.block_timestamp, isListed, data) != "-")}</td>
             </tr>
         )
@@ -134,18 +150,32 @@ function Landa(props) {
 
 }
 
+function getBestOffer(_offers) {
+    var bestOffer = -1;
+    for (let i = 0; i < _offers.length; i++) {
+        if (_offers[i][1] > bestOffer) {
+            bestOffer = _offers[i][1];
+        }
+    }
+    if (bestOffer == -1) {
+        return "-";
+    } else {
+        return (bestOffer / 10000000000) + " RMRK";
+    }
+}
+
 function getLandPrice(_owner, _actualTimestamp, _isListed, _data, _listingPrice) {
     if (_isListed) {
         return _listingPrice + " RMRK";
     } else {
         const landEntropy = _data['entropy'];
         const landRarity = _data['rarity'];
-        if (parseInt(landEntropy) != 0 ) {
+        if (parseInt(landEntropy) != 0) {
             // Land disponibile
             if (_owner == DEFAULT_OWNER_ADDRESS) {
                 // Primary sale
-                var daysPassedFromStart = (_actualTimestamp- DUTCH_AUCTION_START_TIMESTAMP) / 60 / 60 / 24;
-                var tempDiscount = (daysPassedFromStart+0.333) / 180;
+                var daysPassedFromStart = (_actualTimestamp - DUTCH_AUCTION_START_TIMESTAMP) / 60 / 60 / 24;
+                var tempDiscount = (daysPassedFromStart + 0.333) / 180;
                 const DISCOUNT = 1 - tempDiscount * 0.9;
                 var landPrice = getPrimaryMarketPrice(landRarity, DISCOUNT);
                 if (landPrice != -1) {
@@ -179,12 +209,12 @@ function getPrimaryMarketPrice(_rarity, _discountedPrice) {
 
 function getOwnerColorNumber(_landOwner, _owners) {
     for (let i = 0; i < _owners.length; i++) {
-      if (_landOwner == _owners[i]) {
-        return i;
-      }
+        if (_landOwner == _owners[i]) {
+            return i;
+        }
     }
     return -1;
-  }
+}
 
 
 function getBuyButton(isLandListed) {
@@ -199,7 +229,7 @@ function getBuyButton(isLandListed) {
 function getColoredOwner(_landOwner, _owners) {
 
     //console.log("_landOwner: " + _landOwner + " owners: " + _owners);
-    
+
     const color = getOwnerColorNumber(_landOwner, _owners);
 
     switch (color) {

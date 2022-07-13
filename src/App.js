@@ -139,10 +139,12 @@ function App() {
               <th scope="col">Y</th>
               <th scope="col">Rarity</th>
               <th scope='col'>Owned by</th>
+              <th scope='col'>Plots Owned</th>
               <th scope='col'>Biomes</th>
               <th scope='col'>Entropy</th>
               <th scope='col'>On sale</th>
-              <th scope='col'>Actual price (RMRK)</th>
+              <th scope='col'>Actual price</th>
+              <th scope='col'>Highest offer</th>
               <th scope='col'>BUY</th>
             </tr>
           </thead>
