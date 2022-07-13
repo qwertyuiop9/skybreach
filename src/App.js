@@ -11,6 +11,7 @@ function App() {
   const [plotToWatch, setPlotToWatch] = useState(24439);
   const [adjacentPlots, setAdjacentPlots] = useState([]);
   const [ownerAddresses, setOwnerAddresses] = useState([]);
+  const [ownerColors, setOwnerColors] = useState([]);
   const [currentBlockTimestamp, setCurrentBlockTimestamp] = useState(-1);
   // Land coordinates
   const [xCoord, setXCoord] = useState(119);
@@ -45,6 +46,8 @@ function App() {
       console.log("Actual block timestamp: " + responses[1]['timestamp']);
       setCurrentBlockTimestamp(responses[1]['timestamp']);
       setOwnerAddresses(responses[0]);
+      console.log("TESETEST: + " + Array.from(new Set(responses[0])));
+      setOwnerColors(Array.from(new Set(responses[0])));
       differentNeighbours = new Set(responses[0]);
       const rawRollWinningPercentage = differentNeighbours.size + 10;
       const actualRollWinningPercentage = rawRollWinningPercentage * getDutchNeighborLoveMultiplier(responses[1]['timestamp']);
@@ -58,11 +61,10 @@ function App() {
   function getDutchNeighborLoveMultiplier(curretTimestamp) {
     const dutchAuctionStart = 1657209600;
     const totalDutchDays = 180;
-    const totalPassedDays = (curretTimestamp-dutchAuctionStart)/60/60/24;
-    const currentDutchMultiplier = (totalDutchDays-totalPassedDays)/totalDutchDays;
+    const totalPassedDays = (curretTimestamp - dutchAuctionStart) / 60 / 60 / 24;
+    const currentDutchMultiplier = (totalDutchDays - totalPassedDays) / totalDutchDays;
     return currentDutchMultiplier;
   }
-  
 
   useEffect(() => {
     setAdjacentPlots(getAdjacentPlots(plotToWatch));
@@ -115,7 +117,7 @@ function App() {
           <div className='wrapper'>
             <div className='d-flex justify-content-end'>
               <div className='dapp-top-section'><h4>Neighbourly Love Campaign</h4></div>
-            <div className='dapp-top-section'><img width="40" height="40" src={img_hearts} /></div></div>
+              <div className='dapp-top-section'><img width="40" height="40" src={img_hearts} /></div></div>
             <div />
             <p>Percentage of win a roll for the central land:</p>
             <textarea value={neighbourLoveValue} readonly className='textarea' />
@@ -147,7 +149,11 @@ function App() {
           <tbody>
             {
               adjacentPlots.map(land => (
-                <Landa land_id={land.id} key={land.id} block_timestamp={currentBlockTimestamp} />
+                <Landa
+                  land_id={land.id}
+                  key={land.id}
+                  block_timestamp={currentBlockTimestamp}
+                  neighbour_owners={ownerColors}/>
               ))
             }
           </tbody>

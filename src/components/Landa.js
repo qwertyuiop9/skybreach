@@ -95,11 +95,11 @@ function Landa(props) {
 
 
         if (isListed) {
-            console.log("Dato 'isListed' " + isListed);
-            const promise_listed_price = contract.getListedPrice(props.land_id);
-            promise_listed_price.then(response => {
+            contract.getListedPrice(props.land_id).then(response => {
                 if (isListed) {
-                    setListedPrice(response);
+                    var actualPrice = parseInt(response) / 10000000000;
+                    console.log("Land listing price: " + actualPrice);
+                    setListedPrice(actualPrice);
                 } else {
                     setListedPrice("-_-");
                 }
@@ -120,11 +120,11 @@ function Landa(props) {
                 <td>{props.land_id % 256}</td>
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img width="50" height="50" src={getImagePerRarity(data['rarity'])} /></td>
-                <td>{getOwner(owner, data['entropy'])}</td>
+                <td>{getColoredOwner(owner, props.neighbour_owners)}</td>
                 <td>{getBiomes(data)}</td>
                 <td>{getEntropy(data['entropy'])}</td>
                 <td>{isListed ? "Yes" : "No"}</td>
-                <td>{getLandPrice(owner, props.block_timestamp, isListed, data)}</td>
+                <td>{getLandPrice(owner, props.block_timestamp, isListed, data, listedPrice)}</td>
                 <td>{getBuyButton(getLandPrice(owner, props.block_timestamp, isListed, data) != "-")}</td>
             </tr>
         )
@@ -134,10 +134,9 @@ function Landa(props) {
 
 }
 
-function getLandPrice(_owner, _actualTimestamp, _isListed, _data) {
+function getLandPrice(_owner, _actualTimestamp, _isListed, _data, _listingPrice) {
     if (_isListed) {
-        console.log("Function to implement -> secondary sales");
-        return "-";
+        return _listingPrice + " RMRK";
     } else {
         const landEntropy = _data['entropy'];
         const landRarity = _data['rarity'];
@@ -147,7 +146,6 @@ function getLandPrice(_owner, _actualTimestamp, _isListed, _data) {
                 // Primary sale
                 var daysPassedFromStart = (_actualTimestamp- DUTCH_AUCTION_START_TIMESTAMP) / 60 / 60 / 24;
                 var tempDiscount = (daysPassedFromStart+0.333) / 180;
-                console.log("Days passed from start: " + daysPassedFromStart);
                 const DISCOUNT = 1 - tempDiscount * 0.9;
                 var landPrice = getPrimaryMarketPrice(landRarity, DISCOUNT);
                 if (landPrice != -1) {
@@ -179,6 +177,15 @@ function getPrimaryMarketPrice(_rarity, _discountedPrice) {
     return -1; // Price non available or error
 }
 
+function getOwnerColorNumber(_landOwner, _owners) {
+    for (let i = 0; i < _owners.length; i++) {
+      if (_landOwner == _owners[i]) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
 
 function getBuyButton(isLandListed) {
     if (isLandListed) {
@@ -189,25 +196,31 @@ function getBuyButton(isLandListed) {
     }
 }
 
-function getColoredOwner(_landId, _owner, _color) {
+function getColoredOwner(_landOwner, _owners) {
 
-    switch (_color) {
+    //console.log("_landOwner: " + _landOwner + " owners: " + _owners);
+    
+    const color = getOwnerColorNumber(_landOwner, _owners);
+
+    switch (color) {
         case 0:
-            return (<p class="text-primary">{_owner}</p>);
+            return (<p class="text-primary">{_landOwner}</p>);
         case 1:
-            return (<p class="text-secondary">{_owner}</p>);
+            return (<p class="text-secondary">{_landOwner}</p>);
         case 2:
-            return (<p class="text-success">{_owner}</p>);
+            return (<p class="text-success">{_landOwner}</p>);
         case 3:
-            return (<p class="text-danger">{_owner}</p>);
+            return (<p class="text-danger">{_landOwner}</p>);
         case 4:
-            return (<p class="text-warning">{_owner}</p>);
+            return (<p class="text-warning">{_landOwner}</p>);
         case 5:
-            return (<p class="text-info">{_owner}</p>);
+            return (<p class="text-info">{_landOwner}</p>);
         case 6:
-            return (<p class="text-dark">{_owner}</p>);
+            return (<p class="text-dark">{_landOwner}</p>);
         case 7:
-            return (<p class="text-muted">{_owner}</p>);
+            return (<p class="text-muted">{_landOwner}</p>);
+        default:
+            return (<p>{_landOwner}</p>);
     }
 
 }
@@ -222,9 +235,9 @@ function getEntropy(response_value) {
 
 function getOwner(owner, entropy) {
     if (entropy != 0) {
-        return owner;
+        return (<div class="bg-primary d-flex">{owner}</div>);
     } else {
-        return "LAND NOT AVAILABLE";
+        return (<p>"LAND NOT AVAILABLE"</p>);
     }
 }
 
