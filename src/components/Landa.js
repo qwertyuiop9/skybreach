@@ -134,7 +134,7 @@ function Landa(props) {
                 <td>{props.land_id % 256}</td>
                 <td>{Math.floor(props.land_id / 256)}</td>
                 <td><img width="50" height="50" src={getImagePerRarity(data['rarity'])} /></td>
-                <td>{getColoredOwner(owner, props.neighbour_owners)}</td>
+                <td>{getColoredOwner(owner, props.neighbour_owners, props.wallet_connected)}</td>
                 <td>{landsOwnerByOwner}</td>
                 <td>{getBiomes(data)}</td>
                 <td>{getEntropy(data['entropy'])}</td>
@@ -226,31 +226,36 @@ function getBuyButton(isLandListed) {
     }
 }
 
-function getColoredOwner(_landOwner, _owners) {
+function getColoredOwner(_landOwner, _owners, _wallet_connected) {
 
-    //console.log("_landOwner: " + _landOwner + " owners: " + _owners);
+    var landOwner;
+    if (_wallet_connected != null) {
+        landOwner = _landOwner == _wallet_connected ? "YOU" : _landOwner;
+    } else {
+        landOwner = _landOwner;
+    }
 
     const color = getOwnerColorNumber(_landOwner, _owners);
 
     switch (color) {
         case 0:
-            return (<p class="text-primary">{_landOwner}</p>);
+            return (<p class="text-primary">{landOwner}</p>);
         case 1:
-            return (<p class="text-secondary">{_landOwner}</p>);
+            return (<p class="text-secondary">{landOwner}</p>);
         case 2:
-            return (<p class="text-success">{_landOwner}</p>);
+            return (<p class="text-success">{landOwner}</p>);
         case 3:
-            return (<p class="text-danger">{_landOwner}</p>);
+            return (<p class="text-danger">{landOwner}</p>);
         case 4:
-            return (<p class="text-warning">{_landOwner}</p>);
+            return (<p class="text-warning">{landOwner}</p>);
         case 5:
-            return (<p class="text-info">{_landOwner}</p>);
+            return (<p class="text-info">{landOwner}</p>);
         case 6:
-            return (<p class="text-dark">{_landOwner}</p>);
+            return (<p class="text-dark">{landOwner}</p>);
         case 7:
-            return (<p class="text-muted">{_landOwner}</p>);
+            return (<p class="text-muted">{landOwner}</p>);
         default:
-            return (<p>{_landOwner}</p>);
+            return (<p>{landOwner}</p>);
     }
 
 }

@@ -51,6 +51,11 @@
   color: #ffffff;
 }
 
+.metamaskTitle {
+  padding: 10px;
+  color: #ffffff;
+}
+
 .small_margin {
   margin-top: 10px;
 }
@@ -96,6 +101,11 @@
 }
 
 .dapp-top-section {
+  flex: 0 0 50%;
+  padding: 0;
+}
+
+.dapp-middle-section {
   flex: 0 0 50%;
   padding: 0;
 }

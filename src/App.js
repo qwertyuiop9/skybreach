@@ -20,6 +20,8 @@ function App() {
   const inputYRef = useRef(null);
   // Neighbourly Love Campaign
   const [neighbourLoveValue, setNeighbourLoveValue] = useState("Not calculate yet");
+  // Metamask data
+  const [userAddress, setUserAddress] = useState("");
 
   function getIdsFromAdjacents(neighbours) {
     var ids = [];
@@ -28,6 +30,23 @@ function App() {
     }
     return ids;
   }
+
+  // Metamask button
+  const buttonWalletConnectionHandler = () => {
+    if (window.ethereum) {
+      console.log("Ci siamo un po'");
+      // Connecting to wallet
+      window.ethereum
+        .request({ method: "eth_requestAccounts" })
+        .then((wallets) => accountChangeHandler(wallets[0]));
+    } else {
+      console.log("Manca matamask o altri errori");
+    }
+  };
+
+  const accountChangeHandler = (wallet) => {
+    setUserAddress(wallet);
+  };
 
 
   function handleClick() {
@@ -75,19 +94,21 @@ function App() {
     <div>
 
       <div className='article-container'>
-        <div className='dapp-top-section'>
-          <div class="p-3 mb-2 bg-dark text-white">
-            <h2 className='myTitle' id='adjacentLands'>Discover my neighbors price</h2>
+        <div class='dapp-top-section bg-dark'>
+          <div class="p-4 mb-4 bg-dark text-white">
+            <h1 className='myTitle' id='adjacentLands'>Discover my neighbors price</h1>
           </div>
         </div>
-        <div className='dapp-top-section'>
+        <div className='dapp-top-section bg-dark'>
           <div class="p-3 mb-2 bg-dark text-white">
-            <h2 className='myTitle' id='metamaskSection'>Metamask coming soon...</h2></div>
+            <h3 className='metamaskTitle' id='metamaskSection'>{userAddress == "" ? "Wallet not connected" : userAddress}</h3>
+            <button type="button" onClick={buttonWalletConnectionHandler} class="btn btn-info" id='metamaskConnectionButton'>{userAddress != "" ? "Update address" : "Connect wallet"}</button>
+          </div>
         </div>
       </div>
 
       <div className='article-container'>
-        <div className='dapp-top-section'>
+        <div className='dapp-middle-section'>
           <div className='wrapper'>
             <h4>Land owned centered in:</h4>
             <div class="row">
@@ -113,11 +134,11 @@ function App() {
             </div>
           </div>
         </div>
-        <div className='dapp-top-section'>
+        <div className='dapp-middle-section'>
           <div className='wrapper'>
             <div className='d-flex justify-content-end'>
-              <div className='dapp-top-section'><h4>Neighbourly Love Campaign</h4></div>
-              <div className='dapp-top-section'><img width="40" height="40" src={img_hearts} /></div></div>
+              <div className='dapp-middle-section'><h4>Neighbourly Love Campaign</h4></div>
+              <div className='dapp-middle-section'><img width="40" height="40" src={img_hearts} /></div></div>
             <div />
             <p>Percentage of win a roll for the central land:</p>
             <textarea value={neighbourLoveValue} readonly className='textarea' />
@@ -155,7 +176,8 @@ function App() {
                   land_id={land.id}
                   key={land.id}
                   block_timestamp={currentBlockTimestamp}
-                  neighbour_owners={ownerColors}/>
+                  neighbour_owners={ownerColors}
+                  wallet_connected={userAddress} />
               ))
             }
           </tbody>
