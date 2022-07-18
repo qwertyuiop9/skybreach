@@ -34,7 +34,6 @@ function App() {
   // Metamask button
   const buttonWalletConnectionHandler = () => {
     if (window.ethereum) {
-      console.log("Ci siamo un po'");
       // Connecting to wallet
       window.ethereum
         .request({ method: "eth_requestAccounts" })
