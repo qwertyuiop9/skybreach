@@ -230,8 +230,11 @@ function getColoredOwner(_landOwner, _owners, _wallet_connected) {
 
     var landOwner;
     if (_wallet_connected != null) {
-        landOwner = _landOwner == _wallet_connected ? "YOU" : _landOwner;
+        console.log("Actual wallet connected is: " + _wallet_connected);
+        console.log("Attuale == landOwner: " +  _landOwner.toLowerCase() == _wallet_connected.toLowerCase());
+        landOwner = _landOwner.toLowerCase() == _wallet_connected.toLowerCase() ? "YOU" : _landOwner;
     } else {
+        console.log("Get null value for actual connected wallet");
         landOwner = _landOwner;
     }
 
