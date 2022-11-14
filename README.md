@@ -1,15 +1,10 @@
-# 🚀 Welcome to your new awesome project!
+# Skybreach Tools
 
-This project has been created using **webpack-cli**, you can now run
+Explore your neighbour in order to choose the best land to buy!
+Biomes, gift probability and other info all in one place.
 
-```
-npm run build
-```
+## dApp link
 
-or
+Access dApp features here -->
 
-```
-yarn build
-```
-
-to bundle your application
+https://skybreach.vercel.app/
